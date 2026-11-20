@@ -1,0 +1,28 @@
+{
+  "name": "posts-api",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marine-rle/posts-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/marine-rle/posts-api/issues"
+  },
+  "homepage": "https://github.com/marine-rle/posts-api#readme",
+  "dependencies": {
+    "@koa/router": "^15.7.1",
+    "joi": "^18.3.2",
+    "koa": "^3.3.0",
+    "koa-bodyparser": "^4.4.1"
+  }
+}
