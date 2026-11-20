@@ -13,6 +13,11 @@ const postSchema = Joi.object({
   body: Joi.string().min(1).max(500).required(),
 }).strict();
 
+const patchSchema = postSchema.fork(
+  ["postId", "name", "email", "body"],
+  (schema) => schema.optional()
+);
+
 const app = new Koa();
 const router = new Router();
 
@@ -47,7 +52,7 @@ router.post("/posts", (ctx) => {
   const { error, value } = postSchema.validate(ctx.request.body);
   if (error) {
     ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
+    ctx.body = { error: error.message };
     return;
   }
   const id = Math.max(0, ...posts.map((p) => p.id)) + 1;
@@ -64,6 +69,32 @@ router.delete("/posts/:id", (ctx) => {
   if (postIndex === -1) ctx.throw(404, "Post introuvable");
   posts.splice(postIndex, 1);
   ctx.status = 204;
+});
+
+router.put("/posts/:id", (ctx) => {
+  const id = Number(ctx.params.id);
+  const postIndex = posts.findIndex((p) => p.id === id);
+  if (postIndex === -1) ctx.throw(404, "Post introuvable");
+  const { error, value } = postSchema.validate(ctx.request.body);
+  if (error) ctx.throw(400, error.message);
+  posts[postIndex] = { id, ...value };
+  ctx.body = posts[postIndex];
+});
+
+router.patch("/posts/:id", (ctx) => {
+  const id = Number(ctx.params.id);
+  const post = posts.find((p) => p.id === id);
+  if (!post) ctx.throw(404, "Post introuvable");
+
+  if (Object.keys(ctx.request.body).length === 0) {
+    ctx.throw(400, "Aucun champ à modifier");
+  }
+
+  const { error, value } = patchSchema.validate(ctx.request.body);
+  if (error) ctx.throw(400, error.message);
+
+  Object.assign(post, value);
+  ctx.body = post;
 });
 
 app.use(async (ctx, next) => {
